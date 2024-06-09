@@ -1,0 +1,111 @@
+Gene Maipulation in R using dplyr
+
+#load libraries
+library(dplyr)
+library(tidyverse)
+library(GEOquery)
+
+#to get GEOquery lib
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("GEOquery")
+
+#to know the rows and columns
+dim(sample_yt_GSE183947_fpkm_csv)
+
+# get metadata
+gse <- getGEO(GEO = 'GSE183947', GSEMatrix= TRUE)
+
+# to view objact asscocited with gse id
+gse
+
+# To get the Phenodata of the object of 1st element in that list
+metadata <- pData(phenoData(gse[[1]]))
+
+# to view the metadata
+head(metadata)
+
+# To select the column needed (run dplyr library before running this command)
+metadata.subset <- select(metadata, c(1,10,11,17))
+
+# Use the pipe operator (For 1st 6 rows) -> help not to lose the track (dplyr, tidyverse)
+metadata %>%
+  select(1,10,11,17) %>%
+  head()
+
+# Rename the column name 
+metadata %>%
+  select(1,10,11,17) %>%
+  rename(tissue = characteristics_ch1) %>%
+  rename(metastasis = characteristics_ch1.1) %>%
+  head()
+
+# "mutate" function -> create new column from data frame or can change values from existing data
+# remove the string "tissue:"
+metadata %>%
+  select(1,10,11,17) %>%
+  rename(tissue = characteristics_ch1) %>%
+  rename(metastasis = characteristics_ch1.1) %>%
+  mutate(tissue = gsub("tissue: ", "",tissue)) %>%
+  mutate(metastasis = gsub("metastasis: ", "",metastasis)) %>%
+  head()
+
+#save this modified metadata
+metadata.modified <- metadata %>%
+  select(1,10,11,17) %>%
+  rename(tissue = characteristics_ch1) %>%
+  rename(metastasis = characteristics_ch1.1) %>%
+  mutate(tissue = gsub("tissue: ", "",tissue)) %>%
+  mutate(metastasis = gsub("metastasis: ", "",metastasis))
+
+head(sample_yt_GSE183947_fpkm_csv)
+
+# Reshaping data (gather function {tidyr} -> for convert wide format to long format)
+# gather requires 2 parameters - key,value
+# added -gene to ignore the format conversion in gene column
+library(tidyr)
+sample_yt_GSE183947_fpkm_csv %>%
+  rename(gene = ...1) %>%
+  gather(key = 'samples', value = 'FPKM', -gene) %>%
+  head()
+
+#Reshaped data is connected with modified metadata by matching the sample values of them
+#i.e., we are merging the data frames hence we have to change shape of the data
+sample_yt_GSE183947_fpkm_csv.long <- sample_yt_GSE183947_fpkm_csv %>%
+  rename(gene = ...1) %>%
+  gather(key = 'samples', value = 'FPKM', -gene)
+
+# join dataframes = sample_yt_GSE183947_fpkm_csv.long (samples) + metadata.modified (description) both should have matching values
+#left_join function is dplyr lib
+
+sample_yt_GSE183947_fpkm_csv.long %>%
+  left_join(., metadata.modified, by = c("samples" = "description")) %>%
+  head()
+
+# save this joined info
+sample_yt_GSE183947_fpkm_csv.long <- sample_yt_GSE183947_fpkm_csv.long %>%
+  left_join(., metadata.modified, by = c("samples" = "description"))
+
+# Explore data (to extract the expression of 2 genes -> BRCA1 , BRCA2{breast cancer genes})
+# and to compare the expression between tumor vs normal samples
+
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene == 'BRCA1' | gene == 'BRCA2' ) %>%
+  head()
+
+# {'summarize' function - to calculate median and mean expression of each gene (group 1) in each type of the tissue (group 2)
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene == 'BRCA1' | gene == 'BRCA2' ) %>%
+  group_by(gene, tissue) %>%
+  summarize(mean_FPKM =  mean(FPKM),
+            median_FPKM =  median(FPKM))
+
+#'arrange' funtion is to arrange in ascending (default) or descending order values(add '-' before mean_FPKM)
+
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene == 'BRCA1' | gene == 'BRCA2' ) %>%
+  group_by(gene, tissue) %>%
+  summarize(mean_FPKM =  mean(FPKM),
+            median_FPKM =  median(FPKM)) %>%
+  arrange(mean_FPKM)
