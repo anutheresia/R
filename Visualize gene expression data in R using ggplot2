@@ -1,0 +1,71 @@
+Visualize gene expression data in R using ggplot2
+
+#load the libraries
+library(tidyverse)
+library(ggplot2)
+
+#Basic format for ggplot (3 parameters are data, aesthetic[x and y axis] and pipe operator [for additional function])
+#ggplot(data, aes(x = variable, y= variable1)) +
+#  geom_col() 
+
+# 1. barplot
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene == 'BRCA1') %>%
+  ggplot(., aes(x = samples, y = FPKM, fill = tissue)) +
+  geom_col()
+
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene == 'BRCA2') %>%
+  ggplot(., aes(x = samples, y = FPKM, fill = tissue)) +
+  geom_col()
+  
+# 2. density (to compare expression distribution)
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene == 'BRCA1') %>%
+  ggplot(., aes(x = FPKM, fill = tissue)) +
+  geom_density(alpha = 0.3)     # [added the opacity to view the overlapped expression]
+
+# 3. Boxplot ( to compaare gene expression between 2 metastasis group)
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene == 'BRCA1') %>%
+  ggplot(., aes(x = metastasis, y = FPKM)) +
+  geom_boxplot()
+
+# 4. scatterplot (to compare expression between 2 genes BRCA1 and BRCA2)->to know if there is any co-relation
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene == 'BRCA1' | gene == 'BRCA2') %>%
+  spread(key = gene, value = FPKM) %>%
+  ggplot(., aes(x = BRCA1, y = BRCA2, colour = tissue)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE)
+
+# 5. heatmap (to compare genes across all the samples)
+genes.of.interest <- c('BRCA1', 'BRCA2', 'TP53','ALK', 'MYCN')
+
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene %in% genes.of.interest) %>%
+  ggplot(., aes(x = samples, y = gene, fill = FPKM)) +
+  geom_tile() +
+  scale_fill_gradient(low = 'white', high = 'red')
+
+# How to save the plot (can save as pdf, png,)
+  #method 1
+
+p <- sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene %in% genes.of.interest) %>%
+  ggplot(., aes(x = samples, y = gene, fill = FPKM)) +
+  geom_tile() +
+  scale_fill_gradient(low = 'white', high = 'red')
+
+ggsave(p, filename = 'heatmap_s1.pdf', width = 10, height = 8)
+
+  #method 2
+
+pdf('heatmap_s3.pdf', width = 10, height = 8)
+sample_yt_GSE183947_fpkm_csv.long %>%
+  filter(gene %in% genes.of.interest) %>%
+  ggplot(., aes(x = samples, y = gene, fill = FPKM)) +
+  geom_tile() +
+  scale_fill_gradient(low = 'white', high = 'red')
+
+dev.off()
