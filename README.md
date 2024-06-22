@@ -1,100 +1,22 @@
 
-# This is a comment
-"Hello World!"
+# Aim:
+   To analyze gene expression data from breast cancer and normal breast tissues, decipher differential expression patterns of breast cancer-associated genes, and generate interactive and informative visualizations using R.
 
-name <- "John"
-age <- 40
+# Packages used:
+   This project employed R programming alongside essential packages such as dplyr, tidyverse, ggplot2, and GEOquery to preprocess, analyze, and visualize gene expression data effectively. Various graphical representations including bar plots, density plots, histograms, box plots, and scatter plots were created to elucidate the expression profiles of pivotal genes (e.g., BRCA1, BRCA2, TP53) and their relevance to breast cancer progression and metastasis.
 
-name   # output "John"
-age    # output 40
+# About the Dataset:
+Dataset Overview: Breast cancer ranks among the most prevalent cancers worldwide, impacting millions of women annually. The GSE183947 dataset pertains to breast cancer tissue and encompasses RNA sequencing data derived from 30 pairs of normal and cancerous tissues. The RNA sequencing reads were normalized using Fragments Per Kilobase of transcript per Million mapped reads (FPKM) methodology.
 
-str <- "Hello"
-str # print the value of str
+# Note:
+(i) RNA Sequencing (RNA-seq) --> measure gene expression, distinct from DNA microarrays.
 
-# Create a vector of pies
-x <- c(10,20,30,40)
 
-# Display the pie chart
-pie(x)
+(ii) FPKM  -->  normalize RNA-seq data. It adjusts read counts by considering both the length of genes and the total number of mapped reads. This helps correct biases that can arise from longer genes being more likely to have multiple reads counted, ensuring more accurate measurements of gene expression levels.
 
-2
-# Create a vector of labels
-mylabel <- c("Apples", "Bananas", "Cherries", "Dates")
 
-# Create a vector of colors
-colors <- c("blue", "yellow", "green", "black")
 
-# Create a vector of values
-x <- c(10, 20, 30, 40)
+# Summary:
+mRNA extracted from both normal and tumor samples is fragmented and converted to cDNA through reverse transcription. Short DNA adapters are attached to the cDNA ends for sequencing platform binding. PCR amplifies these cDNA fragments into a library, sequenced on platforms such as Illumina, PacBio, or Oxford Nanopore. Sequencing platforms then align these cDNA sequences to a reference genome, counting reads per gene or transcript. Raw read counts undergo normalization to adjust for sequencing depth and gene length using methods like FPKM (Fragments Per Kilobase of transcript per Million mapped reads) or TPM. Then, Differential Gene Expression Data Analysis is performed.
 
-# Display the pie chart with colors
-pie(x, label = mylabel, main = "Pie Chart", col = colors)
 
-# Display the explanation box
-legend("bottomright", mylabel, fill = colors)
-
-3
-# Get the library.
-library(plotrix)
-
-# Create data for the graph.
-x <-  c(21, 62, 10,53)
-lbl <-  c("London","New York","Singapore","Mumbai")
-
-# Give the chart file a name.
-png(file = "3d_pie_chart.png")
-
-# Plot the chart.
-pie3D(x,labels = lbl,explode = 0.1, main = "Pie Chart of Countries ")
-
-# Save the file.
-dev.off()
-
-4
-# Create the data for the chart
-H <- c(7,12,28,3,41)
-
-# Give the chart file a name
-png(file = "barchart.png")
-
-# Plot the bar chart 
-barplot(H)
-
-# Save the file
-dev.off()
-
-5
-library(readr,dplyr)
-library("ggplot2")
-library("corrplot")
-library("gridExtra")
-library("pROC")
-library("MASS")
-library("caTools")
-library("caret")
-
-data <- read.csv("C:/Users/USER/Documentss/data.csv")
-
-For Bioinfo
-if (!require("BiocManager", quietly = TRUE))
-install.packages("BiocManager")
-BiocManager::install(version = "3.18")
-
-DNA Sequence analysis
-
-library("seqinr")
-
-dengue <- read.fasta(file = "sequence (1).fasta")
-dengueseq <- dengue [[1]]
-length(dengueseq)
-table(dengueseq)
-GC(dengueseq)
-count(dengueseq, 1)
-count(dengueseq, 2)
-
-library("seqinr")
-leprae <- read.fasta(file = "Q9CD83.fasta")
-ulcerans <- read.fasta(file = "A0PQ23.fasta")
-lepraeseq <- leprae[[1]]
-ulceransseq <- ulcerans[[1]]
-lepraeseq # Display the contents of the vector "lepraeseq"
