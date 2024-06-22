@@ -39,7 +39,7 @@ sample_yt_GSE183947_fpkm_csv.long %>%
   geom_point() +
   geom_smooth(method = 'lm', se = FALSE)
 
-# 5. heatmap (to compare genes across all the samples)
+# 5. heatmap (to compare genes across all the samples) ---> lighter colours indicate low expression levels, while darker colours signify higher expression levels for the respective gene.
 genes.of.interest <- c('BRCA1', 'BRCA2', 'TP53','ALK', 'MYCN')
 
 sample_yt_GSE183947_fpkm_csv.long %>%
